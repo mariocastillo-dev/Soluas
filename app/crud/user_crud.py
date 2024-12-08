@@ -34,15 +34,20 @@ class UserCRUD:
             self.session.close()
 
     def get_all_users(self):
-        """Fetch all users from the database"""
         try:
             users = self.session.query(User).all()
             return users
         except Exception as e:
             return f"An error occurred: {str(e)}"
 
+    def get_user_by_ID_documento(self, ID_documento: int):
+        try:
+            user = self.session.query(User).filter(User.ID_documento == ID_documento).first()
+            return user
+        except Exception as e:
+            return f"An error occurred: {str(e)}"
+
     def update_user(self, ID_documento, nombre=None, email=None):
-        """Update user details by ID_documento"""
         try:
             user = self.session.query(User).filter(User.ID_documento == ID_documento).first()
             if not user:
@@ -52,6 +57,10 @@ class UserCRUD:
             if nombre:
                 user.nombre = nombre
             if email:
+                # Verificar que el nuevo email no exista ya en otro usuario
+                existing_user = self.session.query(User).filter(User.email == email, User.ID_documento != ID_documento).first()
+                if existing_user:
+                    return "Another user with this email already exists."
                 user.email = email
 
             self.session.commit()
@@ -63,13 +72,11 @@ class UserCRUD:
             self.session.close()
 
     def delete_user(self, ID_documento):
-        """Delete user by ID_documento"""
         try:
             user = self.session.query(User).filter(User.ID_documento == ID_documento).first()
             if not user:
                 return "User not found."
 
-            # Delete the user
             self.session.delete(user)
             self.session.commit()
             return "User deleted successfully."

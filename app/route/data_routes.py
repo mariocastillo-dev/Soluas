@@ -8,14 +8,10 @@ from app.models.facts import Facts
 router = APIRouter()
 
 @router.get("/facts", response_model=dict)
-def get_facts_data(year: int = None, month: int = None, db: Session = Depends(get_db)):
+def get_facts_data(year: int, customer_id: int, db: Session = Depends(get_db)):
     try:
-        query = db.query(Facts)
-        if year:
-            query = query.filter(Facts.year == year)
-        if month:
-            query = query.filter(Facts.month == month)
-        
+        # Filtra directamente por year y customer_id
+        query = db.query(Facts).filter(Facts.year == year, Facts.customer_id == customer_id)
         result = query.all()
         return {"status": "success", "data": [fact.as_dict() for fact in result]}
     except Exception as e:
