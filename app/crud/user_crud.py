@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.models.user import User
 from app.models.role import Role
 from app.core.security import get_password_hash
@@ -15,7 +16,7 @@ class UserCRUD:
                 return "Role does not exist. Please create the role first."
 
             # Check if the user already exists
-            existing_user = self.session.query(User).filter((User.ID_documento == ID_documento) | (User.email == email)).first()
+            existing_user = self.session.query(User).filter(or_(User.ID_documento == ID_documento, User.email == email)).first()
             if existing_user:
                 return "User with this ID_documento or email already exists."
 
@@ -30,8 +31,6 @@ class UserCRUD:
         except Exception as e:
             self.session.rollback()
             return f"An error occurred: {str(e)}"
-        finally:
-            self.session.close()
 
     def get_all_users(self):
         try:
@@ -68,8 +67,6 @@ class UserCRUD:
         except Exception as e:
             self.session.rollback()
             return f"An error occurred: {str(e)}"
-        finally:
-            self.session.close()
 
     def delete_user(self, ID_documento):
         try:
@@ -83,5 +80,3 @@ class UserCRUD:
         except Exception as e:
             self.session.rollback()
             return f"An error occurred: {str(e)}"
-        finally:
-            self.session.close()

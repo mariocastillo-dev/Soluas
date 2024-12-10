@@ -17,8 +17,6 @@ class RoleCRUD:
         except Exception as e:
             self.session.rollback()
             return f"An error occurred: {str(e)}"
-        finally:
-            self.session.close()
 
     def get_all_roles(self):
         try:
@@ -50,8 +48,6 @@ class RoleCRUD:
         except Exception as e:
             self.session.rollback()
             return f"An error occurred: {str(e)}"
-        finally:
-            self.session.close()
 
     def delete_role(self, role_id: int):
         try:
@@ -64,5 +60,3 @@ class RoleCRUD:
         except Exception as e:
             self.session.rollback()
             return f"An error occurred: {str(e)}"
-        finally:
-            self.session.close()
