@@ -59,7 +59,7 @@ def update_role(role_id: int, new_role_name: str, db: Session = Depends(get_db),
     else:
         raise HTTPException(status_code=500, detail=response)
 
-router.delete("/{role_id}", response_model=dict)
+@router.delete("/{role_id}", response_model=dict)
 def delete_role(role_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not has_permission(current_user, "delete_role"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete roles")
