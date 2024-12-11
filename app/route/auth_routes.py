@@ -21,5 +21,10 @@ def login(credentials: AuthLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     # Crear el token
-    access_token = create_access_token(data={"sub": user.email})
+    access_token = create_access_token(data={
+    "sub": user.email,
+    "role_id": user.role_id,
+    "nombre": user.nombre,
+    "ID_documento": user.ID_documento
+    })
     return {"access_token": access_token, "token_type": "bearer"}
