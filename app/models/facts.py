@@ -16,9 +16,7 @@ class Facts(Base):
     # Método para convertir a diccionario para facilitar la respuesta JSON
     def as_dict(self):
         return {
-            "id": self.id_facts,
             "customer_id": self.customer_id,
-            "customer_name": self.customer_name,
             "year": self.year,
             "month": self.month,
             "field": self.field,

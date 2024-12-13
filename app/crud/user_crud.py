@@ -61,7 +61,7 @@ class UserCRUD:
                 if existing_user:
                     return "Another user with this email already exists."
                 user.email = email
-
+            
             self.session.commit()
             return "User updated successfully."
         except Exception as e:

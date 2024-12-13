@@ -4,7 +4,7 @@ from typing import Optional
 from app.schemas.user_schema import UserCreate
 from app.core.database import get_db
 from app.crud.user_crud import UserCRUD
-from app.core.security import get_current_user, has_permission
+from app.core.security import get_password_hash, get_current_user, has_permission
 from app.models.user import User
 
 router = APIRouter()
@@ -88,3 +88,31 @@ def delete_user(ID_documento: int, db: Session = Depends(get_db), current_user: 
         raise HTTPException(status_code=404, detail=response)
     else:
         raise HTTPException(status_code=500, detail=response)
+
+@router.put("/change-password", response_model=dict)
+def change_password(ID_documento: int, new_password: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Verificar permiso (opcional si solo admin puede cambiar contraseñas de otros usuarios)
+    if not has_permission(current_user, "update_password"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to change passwords")
+
+    # Buscar al usuario en la base de datos
+    user_crud = UserCRUD(db)
+    user = user_crud.get_user_by_ID_documento(ID_documento)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    try:
+        # Generar el hash de la nueva contraseña
+        hashed_password = get_password_hash(new_password)
+
+        # Actualizar la contraseña del usuario
+        user.hashed_password = hashed_password
+        db.commit()
+
+        return {
+            "status": "success",
+            "message": "Password updated successfully."
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An error occurred: {str(e)}")
